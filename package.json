@@ -1,0 +1,127 @@
+{
+  "name": "capsaas2",
+  "version": "0.0.1",
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "description": "Business Application",
+  "engines": {
+    "node": "12.x"
+  },
+  "dependencies": {
+    "@sap/cds": "^5",
+    "@sap/audit-logging": "^5",
+    "@sap/hana-client": "^2",
+    "@sap/xsenv": "^3",
+    "@sap/xssec": "^3",
+    "passport": "^0.4.1",
+    "@sap/cds-mtx": "^2",
+    "cfenv": "^1",
+    "axios": "^0.21.1",
+    "qs": "^6",
+
+    "debug": "^4.3",
+    "express": "^4"
+  },
+  "devDependencies": {
+    "sqlite3": "^5"
+  },
+  "scripts": {
+    "start": "npx cds run"
+  },
+  "cds": {
+    "requires": {
+      "uaa": {
+        "kind": "xsuaa"
+      },
+      "auth": {
+        "[production]": {
+          "strategy": "JWT"
+        },
+        "[development]": {
+          "strategy": "mock",
+          "users": {
+            "joe": {
+              "roles": [
+                "Admin",
+                "Viewer"
+              ]
+            },
+            "julie": {
+              "roles": [
+                "Viewer"
+              ]
+            },
+            "bob": {
+              "roles": [
+                "Viewer"
+              ]
+            }
+          }
+        }
+      }
+      ,
+      "db": {
+        "[production]": {
+          "kind": "hana"
+        },
+        "[development]": {
+          "kind": "sql"
+        },
+        "model": [
+          "db",
+          "srv"
+        ]
+        ,
+        "vcap": {
+          "label": "service-manager"
+        }
+      }
+      ,
+      "multitenancy": true
+      ,
+      "API_SALES_ORDER_SRV": {
+        "kind": "odata-v2",
+        "model": "srv/external/API_SALES_ORDER_SRV",
+        "credentials": {
+          "[production]": {
+            "destination": "capsaas2-API_SALES_ORDER_SRV",
+            "path": "s4hanacloud/sap/opu/odata/sap/API_SALES_ORDER_SRV"
+          },
+          "[development]": {
+            "url": "https://sandbox.api.sap.com/s4hanacloud/sap/opu/odata/sap/API_SALES_ORDER_SRV"
+          }
+        }
+      }
+      }
+    ,
+    "mtx": {
+      "api": {
+        "provisioning": true,
+        "metadata": true,
+        "model": true
+      },
+      "element-prefix": [
+        "Z_",
+        "ZZ_"
+      ],
+      "namespace-blocklist": [
+        "com.sap.",
+        "sap.",
+        "capsaas2."
+      ],
+      "extension-allowlist": [
+        {
+          "for": ["capsaas2.db.Sales"]
+        },
+        {
+          "for": ["CatalogService"],
+          "kind": "service"
+        }
+      ]
+    }
+    ,
+    "hana": {
+      "deploy-format": "hdbtable"
+    }
+  }
+}
